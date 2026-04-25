@@ -1,0 +1,64 @@
+// calculator.ark - Interactive Mini-Calculator
+// Demonstrating multiple functions and control flow
+
+fn add(a, b) (
+    return a + b
+)
+
+fn subtract(a, b) (
+    return a - b
+)
+
+fn multiply(a, b) (
+    return a * b
+)
+
+fn divide(a, b) (
+    if (b == 0) (
+        print("Error: Cannot divide by zero")
+        return nil
+    ) else (
+        return a / b
+    )
+)
+
+fn power(base, exp) (
+    return base ** exp
+)
+
+fn calculate(operation, x, y) (
+    if (operation == "add") (
+        return add(x, y)
+    ) elif (operation == "subtract") (
+        return subtract(x, y)
+    ) elif (operation == "multiply") (
+        return multiply(x, y)
+    ) elif (operation == "divide") (
+        return divide(x, y)
+    ) elif (operation == "power") (
+        return power(x, y)
+    ) else (
+        print("Unknown operation: " + operation)
+        return nil
+    )
+)
+
+// Test the calculator
+print("=== Ark Calculator ===")
+print("10 + 5 = " + calculate("add", 10, 5))
+print("10 - 5 = " + calculate("subtract", 10, 5))
+print("10 * 5 = " + calculate("multiply", 10, 5))
+print("10 / 5 = " + calculate("divide", 10, 5))
+print("2 ** 8 = " + calculate("power", 2, 8))
+print("10 / 0 = " + calculate("divide", 10, 0))
+
+// Fibonacci
+fn fibonacci(n) (
+    if (n <= 1) (
+        return n
+    ) else (
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    )
+)
+
+print("Fibonacci(10) = " + fibonacci(10))

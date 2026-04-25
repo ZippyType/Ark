@@ -1,0 +1,28 @@
+// variables.ark - Variables and Basic Operations
+// Demonstrating variable declaration and arithmetic in Ark
+
+let name = "Alice"
+let age = 30
+let country = "Norway"
+
+print(name)
+print(age)
+print(country)
+
+// Math operations
+let x = 10
+let y = 5
+let sum = x + y
+let product = x * y
+let difference = x - y
+
+print("Sum: " + sum)
+print("Product: " + product)
+print("Difference: " + difference)
+
+// Boolean values
+let is_active = true
+let is_admin = false
+
+print(is_active)
+print(is_admin)

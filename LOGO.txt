@@ -1,0 +1,31 @@
+
+    ╔═══════════════════════════════════════════════════════════╗
+    ║                                                           ║
+    ║    ╭─────────────────────────────────────────────────╮   ║
+    ║    │                                                 │   ║
+    ║    │            A R K                              │   ║
+    ║    │        The Parentheses Language               │   ║
+    ║    │                                                 │   ║
+    ║    │    ╭─╮  ╭──────────────────────────────╮       │   ║
+    ║    │    │ │  │  ( Simple. Fast. Pure. )    │       │   ║
+    ║    │    │ │  ╰──────────────────────────────╯       │   ║
+    ║    │    ╰─╯                                         │   ║
+    ║    │                                                 │   ║
+    ║    │    fn code() (                                 │   ║
+    ║    │        print( "Build anything" )              │   ║
+    ║    │    )                                           │   ║
+    ║    │                                                 │   ║
+    ║    ╰─────────────────────────────────────────────────╯   ║
+    ║                                                           ║
+    ║  Version 0.1.0 - The Heart Phase                        ║
+    ║  "Where code flows in parentheses"                      ║
+    ║                                                           ║
+    ╚═══════════════════════════════════════════════════════════╝
+
+COLOR SCHEME (for implementations):
+    Primary:   #1a1a2e (Deep Blue-Black)
+    Accent:    #16c784 (Fresh Green)
+    Highlight: #ff6b35 (Orange)
+    Text:      #ffffff (White)
+
+SYMBOL: Nested parentheses forming a recursive arc: ( ( ) )

@@ -1,0 +1,29 @@
+// functions.ark - Functions and Scope
+// Demonstrating function definitions and calls with Ark syntax
+
+fn greet(name) (
+    print("Hello, " + name + "!")
+)
+
+fn add(a, b) (
+    let result = a + b
+    return result
+)
+
+fn check_age(age) (
+    if (age >= 18) (
+        print("You are an adult")
+    ) else (
+        print("You are a minor")
+    )
+)
+
+// Call functions
+greet("Bob")
+greet("Carol")
+
+let sum = add(7, 3)
+print("7 + 3 = " + sum)
+
+check_age(25)
+check_age(15)

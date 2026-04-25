@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""
+Ark Programming Language - Interactive Shell & Executor
+Allows running .ark files or entering an interactive REPL.
+
+Usage:
+    ark                    # Start interactive shell
+    ark script.ark         # Execute a .ark file
+    ark script.ark arg1 arg2  # Execute with arguments
+"""
+
+import sys
+import os
+import readline
+from pathlib import Path
+
+# Add the Ark directory to sys.path so we can import our modules
+ARK_DIR = Path(__file__).parent.absolute()
+sys.path.insert(0, str(ARK_DIR))
+
+from lexer import lex, TokenType
+from simple_interpreter import BasicInterpreter
+
+
+class ArkShell:
+    """Interactive REPL for the Ark programming language."""
+    
+    def __init__(self):
+        self.globals = {}
+        self.locals = {}
+        self.running = True
+        self.interpreter = BasicInterpreter()
+        self.banner = """
+╔═══════════════════════════════════════════════════════════╗
+║                   A R K   S H E L L                       ║
+║              Version 0.1.0 - The Heart Phase              ║
+║                                                           ║
+║  Type: help() for help, exit() to quit                  ║
+║  Use: () for code blocks, fn for functions              ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+"""
+    
+    def run_interactive(self):
+        """Start the interactive shell."""
+        print(self.banner)
+        
+        buffer = ""
+        
+        while self.running:
+            try:
+                if buffer:
+                    prompt = "... "
+                else:
+                    prompt = "ark> "
+                
+                line = input(prompt)
+                
+                # Check for exit command
+                if line.strip() == "exit()":
+                    print("Goodbye!")
+                    self.running = False
+                    break
+                
+                # Check for help command
+                if line.strip() == "help()":
+                    self.show_help()
+                    continue
+                
+                # Add to buffer
+                buffer += line + "\n"
+                
+                # Check if we have a complete statement
+                # (simplified check - just look for matching parentheses)
+                if self.is_complete(buffer):
+                    self.execute(buffer.strip())
+                    buffer = ""
+            
+            except KeyboardInterrupt:
+                print("\n(Interrupted)")
+                buffer = ""
+            except EOFError:
+                print("\nGoodbye!")
+                break
+            except Exception as e:
+                print(f"Error: {e}")
+                buffer = ""
+    
+    def is_complete(self, code: str) -> bool:
+        """
+        Check if the code buffer is syntactically complete.
+        Simplified: count parentheses.
+        """
+        open_parens = code.count('(')
+        close_parens = code.count(')')
+        
+        # If parens are balanced and we have at least one complete statement
+        if open_parens == close_parens and open_parens > 0:
+            return True
+        
+        # Or if it's a simple statement without parens
+        if open_parens == 0 and close_parens == 0:
+            stripped = code.strip()
+            if stripped and not stripped.endswith('('):
+                return True
+        
+        return False
+    
+    def execute(self, code: str):
+        """Execute code in the REPL."""
+        try:
+            self.interpreter.execute_code(code)
+        except SyntaxError as e:
+            print(f"SyntaxError: {e}")
+        except Exception as e:
+            print(f"Error: {e}")
+    
+    def show_help(self):
+        """Display help information."""
+        help_text = """
+Ark Language Help
+=================
+
+SYNTAX:
+  Variables:  let name = value
+  Functions:  fn name(args) (code)
+  If/Else:    if (cond) (code) else (code)
+  Loops:      while (cond) (code)
+  Loops:      for (i in range(0, 10)) (code)
+
+BUILT-IN FUNCTIONS:
+  print(value)      - Print to console
+  type(value)       - Get type of value
+  exit()            - Exit the shell
+  help()            - Show this help
+
+EXAMPLES:
+  ark> let x = 42
+  ark> print(x)
+  ark> fn add(a, b) (return a + b)
+  ark> print(add(5, 3))
+
+For more info, visit: https://github.com/ZippyType/Ark
+"""
+        print(help_text)
+    
+    def run_file(self, filename: str):
+        """Execute a .ark file."""
+        try:
+            filepath = Path(filename)
+            
+            if not filepath.exists():
+                print(f"Error: File '{filename}' not found")
+                sys.exit(1)
+            
+            if not filepath.suffix == '.ark':
+                print(f"Warning: File '{filename}' does not have .ark extension")
+            
+            with open(filepath, 'r', encoding='utf-8') as f:
+                code = f.read()
+            
+            # Execute the code
+            self.interpreter.execute_code(code)
+            
+        except Exception as e:
+            print(f"Error: {e}")
+            sys.exit(1)
+
+
+def main():
+    """Main entry point for the Ark interpreter."""
+    
+    if len(sys.argv) > 1:
+        arg = sys.argv[1]
+        
+        # Check for version flag
+        if arg in ['-v', '--version', 'version']:
+            print("Ark Language v0.1.0 (The Heart Phase)")
+            print("Python-based Interpreter")
+            sys.exit(0)
+        
+        # Check for help flag
+        if arg in ['-h', '--help', 'help']:
+            print(__doc__)
+            sys.exit(0)
+        
+        # File execution mode
+        filename = arg
+        shell = ArkShell()
+        shell.run_file(filename)
+    else:
+        # Interactive mode
+        shell = ArkShell()
+        shell.run_interactive()
+
+
+if __name__ == "__main__":
+    main()

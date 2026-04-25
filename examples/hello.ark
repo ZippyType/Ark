@@ -1,0 +1,9 @@
+// hello.ark - Classic Ark Hello World
+// This is a comment in Ark
+
+fn main() (
+    print("Hello, World!")
+    print("Welcome to the Ark Programming Language!")
+)
+
+main()
