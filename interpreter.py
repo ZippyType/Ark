@@ -4,6 +4,7 @@ Scoped variable storage: global vs. local scope.
 """
 
 from typing import Any, Callable, Optional
+from pathlib import Path
 from lexer import tokenize
 from parser import parse
 from ast import (
@@ -99,6 +100,14 @@ class Interpreter:
         self.global_scope.define("list", self._native_list)
         self.global_scope.define("dict", self._native_dict)
         self.global_scope.define("input", self._native_input)
+        self.global_scope.define("read_file", self._native_read_file)
+        self.global_scope.define("write_file", self._native_write_file)
+        self.global_scope.define("delete_file", self._native_delete_file)
+        self.global_scope.define("run", self._native_run)
+        self.global_scope.define("window", self._native_window)
+        self.global_scope.define("button", self._native_button)
+        self.global_scope.define("label", self._native_label)
+        self.global_scope.define("entry", self._native_entry)
         self.global_scope.define("range", self._native_range)
         self.global_scope.define("abs", self._native_abs)
         self.global_scope.define("min", self._native_min)
@@ -173,6 +182,28 @@ class Interpreter:
     
     def _native_input(self, prompt: str = "") -> str:
         return input(str(prompt))
+    
+    def _native_run(self, command: str) -> str:
+        import subprocess
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        return result.stdout or result.stderr
+    
+    def _native_read_file(self, filepath: str) -> str:
+        path = Path(filepath)
+        if not path.exists():
+            raise ArkRuntimeError(f"File not found: {filepath}")
+        return path.read_text()
+    
+    def _native_write_file(self, filepath: str, content: str) -> str:
+        path = Path(filepath)
+        path.write_text(content)
+        return "ok"
+    
+    def _native_delete_file(self, filepath: str) -> str:
+        path = Path(filepath)
+        if path.exists():
+            path.unlink()
+        return "ok"
     
     def _native_range(self, *args) -> range:
         return range(*args)

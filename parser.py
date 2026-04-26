@@ -87,16 +87,14 @@ class Parser:
             return self.return_statement()
         if self.match(TokenType.TRY):
             return self.try_statement()
-        if self.match(TokenType.IMPORT):
-            return self.import_statement()
         if self.match(TokenType.BREAK):
             return BreakNode(self.previous().line, self.previous().column)
         if self.match(TokenType.CONTINUE):
             return ContinueNode(self.previous().line, self.previous().column)
-        if self.match(TokenType.PRINT):
-            return self.print_statement()
-        if self.match(TokenType.TYPE):
-            return self.type_statement()
+        if self.match(TokenType.PRINT, TokenType.TYPE):
+            return self._parse_builtin_call(self.previous())
+        if self.match(TokenType.IMPORT):
+            return self.import_statement()
         return self.expression_statement()
     
     def function(self) -> FunctionNode:
@@ -198,14 +196,21 @@ class Parser:
         return TryNode(try_body, catch_body, variable)
     
     def import_statement(self) -> ImportNode:
+        # Check if it's import("path") syntax
+        if self.check(TokenType.LPAREN):
+            self.consume(TokenType.LPAREN, "Expected '('")
+            module = self.consume(TokenType.STRING, "Expected module path").value
+            self.consume(TokenType.RPAREN, "Expected ')'")
+            return ImportNode(module, None)
+        
+        # import x from y syntax
+        names = []
+        while True:
+            names.append(self.consume(TokenType.IDENTIFIER, "Expected name").value)
+            if not self.match(TokenType.COMMA):
+                break
+        self.consume(TokenType.FROM, "Expected 'from'")
         module = self.consume(TokenType.STRING, "Expected module name").value
-        names = None
-        if self.match(TokenType.FROM):
-            names = []
-            while True:
-                names.append(self.consume(TokenType.IDENTIFIER, "Expected name").value)
-                if not self.match(TokenType.COMMA):
-                    break
         return ImportNode(module, names)
     
     def print_statement(self) -> PrintNode:
@@ -333,6 +338,9 @@ class Parser:
             return IdentifierNode(token.value)
         if self.match(TokenType.PRINT, TokenType.TYPE):
             return self._parse_builtin_call(token)
+        if self.match(TokenType.IMPORT):
+            path_token = self.consume(TokenType.STRING, "Expected module path")
+            return ImportNode(path_token.value)
         
         if self.match(TokenType.LPAREN):
             expr = self.expression()

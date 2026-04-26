@@ -1,0 +1,6 @@
+print("Starting test")
+
+result = run("echo Hello from Ark shell")
+print(result)
+
+print("Done")
