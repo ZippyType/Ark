@@ -5,7 +5,7 @@ A high-level, simple-to-use language with a Python-based core. Uses `()` for all
 ## Installation
 
 ```bash
-bash install.sh
+git clone https://github.com/ZippyType/Ark.git && cd Ark && chmod +x install.sh && ./install.sh
 ```
 
 ## Quick Start
