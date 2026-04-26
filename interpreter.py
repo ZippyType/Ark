@@ -427,9 +427,7 @@ class Interpreter:
     def _visit_assignment(self, node):
         value = self.execute(node.value)
         
-        try:
-            self.current_scope.assign(node.target.name, value)
-        except Exception as e:
+        if not self.current_scope.assign(node.target.name, value):
             self.current_scope.define(node.target.name, value)
         
         return value
