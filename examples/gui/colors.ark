@@ -1,0 +1,20 @@
+win = window("Colors Demo", 400, 300)
+
+label(win, "Color Palette", font=Font("Arial", 18, "bold")).pack(pady=10)
+
+colors = [
+    ["Red", Color.RED],
+    ["Green", Color.GREEN],
+    ["Blue", Color.BLUE],
+    ["Yellow", Color.YELLOW],
+    ["Orange", Color.ORANGE],
+    ["Purple", Color.PURPLE]
+]
+
+for pair in colors (
+    lbl = label(win, "  " + pair[0] + "  ")
+    lbl.config(bg=pair[1], fg=Color.WHITE)
+    lbl.pack(fill=X, padx=20, pady=2)
+)
+
+win.mainloop()

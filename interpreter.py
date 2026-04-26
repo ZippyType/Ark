@@ -101,16 +101,26 @@ class Interpreter:
         self.global_scope.define("write_file", self._native_write_file)
         self.global_scope.define("delete_file", self._native_delete_file)
         self.global_scope.define("run", self._native_run)
-        self.global_scope.define("window", self._native_window)
-        self.global_scope.define("button", self._native_button)
-        self.global_scope.define("label", self._native_label)
-        self.global_scope.define("entry", self._native_entry)
-        self.global_scope.define("pack", self._native_pack)
-        self.global_scope.define("grid", self._native_grid)
-        self.global_scope.define("config", self._native_config)
-        self.global_scope.define("mainloop", self._native_mainloop)
-        self.global_scope.define("bind", self._native_bind)
-        self.global_scope.define("get", self._native_get)
+        
+        from lib import ark_ui
+        self.global_scope.define("window", ark_ui.create_window)
+        self.global_scope.define("button", ark_ui.create_button)
+        self.global_scope.define("label", ark_ui.create_label)
+        self.global_scope.define("entry", ark_ui.create_entry)
+        self.global_scope.define("canvas", ark_ui.create_canvas)
+        self.global_scope.define("message", ark_ui.message)
+        self.global_scope.define("ask_yes_no", ark_ui.ask_yes_no)
+        self.global_scope.define("ask_file", ark_ui.ask_file)
+        self.global_scope.define("ask_save", ark_ui.ask_save_file)
+        self.global_scope.define("ask_dir", ark_ui.ask_directory)
+        self.global_scope.define("get", ark_ui.get)
+        self.global_scope.define("config", ark_ui.config)
+        self.global_scope.define("pack", ark_ui.pack)
+        self.global_scope.define("grid", ark_ui.grid)
+        self.global_scope.define("mainloop", ark_ui.run_window)
+        self.global_scope.define("Color", ark_ui.Color)
+        self.global_scope.define("Font", ark_ui.Font)
+        
         self.global_scope.define("http_get", self._native_http_get)
         self.global_scope.define("http_post", self._native_http_post)
         self.global_scope.define("html", self._native_html)
@@ -417,11 +427,9 @@ class Interpreter:
     def _visit_assignment(self, node):
         value = self.execute(node.value)
         
-        depth = self.current_scope.get_depth(node.target.name)
-        
-        if depth > 0 and depth == self.current_scope.depth:
+        try:
             self.current_scope.assign(node.target.name, value)
-        else:
+        except Exception as e:
             self.current_scope.define(node.target.name, value)
         
         return value
@@ -484,6 +492,15 @@ class Interpreter:
             raise ArkRuntimeError(f"Unknown unary: {op}", node)
     
     def _visit_call(self, node):
+        if "." in node.name:
+            obj_name, method_name = node.name.split(".", 1)
+            obj = self.current_scope.get(obj_name)
+            method = getattr(obj, method_name, None)
+            if method is None:
+                raise ArkRuntimeError(f"Object {obj_name} has no method {method_name}", node)
+            args = [self.execute(arg) for arg in node.arguments]
+            return method(*args)
+        
         callee = None
         
         try:
@@ -533,11 +550,12 @@ class Interpreter:
         self.current_scope_idx = len(self.scopes) - 1
         
         result = None
-        for stmt in node.statements:
-            result = self.execute(stmt)
-        
-        self.scopes.pop()
-        self.current_scope_idx = old_scope_idx
+        try:
+            for stmt in node.statements:
+                result = self.execute(stmt)
+        finally:
+            self.scopes.pop()
+            self.current_scope_idx = old_scope_idx
         
         return result
     
@@ -584,7 +602,15 @@ class Interpreter:
         
         for item in iterable:
             self.current_scope.define(node.variable, item)
-            self._visit_block(node.body)
+            should_break = False
+            try:
+                self._visit_block(node.body)
+            except ContinueLoop:
+                pass
+            except BreakLoop:
+                should_break = True
+            if should_break:
+                break
         
         return None
     

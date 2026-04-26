@@ -118,12 +118,12 @@ class Parser:
     
     def block(self) -> BlockNode:
         statements = []
+        while self.match(TokenType.NEWLINE):
+            pass
         while not self.check(TokenType.RPAREN) and not self.is_at_end():
             if self.check(TokenType.NEWLINE):
                 self.advance()
                 continue
-            if self.check(TokenType.RPAREN):
-                break
             statements.append(self.statement())
         return BlockNode(statements)
     
@@ -173,10 +173,36 @@ class Parser:
     def for_statement(self) -> ForNode:
         variable = self.consume(TokenType.IDENTIFIER, "Expected loop variable").value
         self.consume(TokenType.IN, "Expected 'in'")
-        iterable = self.expression()
-        # For loop uses single statement, not block
-        stmt = self.statement()
-        return ForNode(variable, iterable, BlockNode([stmt]))
+        
+        if self.check(TokenType.LBRACKET):
+            self.advance()
+            elements = []
+            while self.match(TokenType.NEWLINE):
+                pass
+            if not self.check(TokenType.RBRACKET):
+                while True:
+                    elements.append(self.expression())
+                    while self.match(TokenType.NEWLINE):
+                        pass
+                    if not self.match(TokenType.COMMA):
+                        break
+            self.consume(TokenType.RBRACKET, "Expected ']'")
+            iterable = ListNode(elements)
+        else:
+            iterable = self.expression()
+        
+        while self.match(TokenType.NEWLINE):
+            pass
+        
+        if self.check(TokenType.LPAREN):
+            self.consume(TokenType.LPAREN)
+            body = self.block()
+            self.consume(TokenType.RPAREN, "Expected ')' to close for body")
+        else:
+            stmt = self.statement()
+            body = BlockNode([stmt])
+        
+        return ForNode(variable, iterable, body)
     
     def return_statement(self) -> ReturnNode:
         value = None
@@ -195,17 +221,8 @@ class Parser:
         variable = "error"
         if self.check(TokenType.IDENTIFIER):
             variable = self.advance().value
-        print(f"TRY: about to consume LPAREN, current is {self.peek().type.name} at {self.peek().line}:{self.peek().column}")
-        if not self.check(TokenType.LPAREN):
-            print(f"TRY: ERROR - not at LPAREN!")
-            # List next few tokens
-            for i in range(5):
-                idx = self.current + i
-                if idx < len(self.tokens):
-                    print(f"  tokens[{idx}] = {self.tokens[idx].type.name}")
-        else:
-            self.advance()
-            print(f"TRY: consumed LPAREN, now at {self.peek().type.name}")
+        self.consume(TokenType.LPAREN, "Expected '(' after catch")
+        # Skip newlines after catch LPAREN
         while self.match(TokenType.NEWLINE):
             pass
         catch_body = self.block()
@@ -321,7 +338,26 @@ class Parser:
     def call(self) -> ASTNode:
         expr = self.primary()
         while True:
-            if self.match(TokenType.LPAREN):
+            if self.match(TokenType.DOT):
+                name_token = self.consume(TokenType.IDENTIFIER, "Expected method name")
+                if self.match(TokenType.LPAREN):
+                    args = []
+                    if not self.check(TokenType.RPAREN):
+                        while True:
+                            args.append(self.expression())
+                            if not self.match(TokenType.COMMA):
+                                break
+                    self.consume(TokenType.RPAREN, "Expected ')' after arguments")
+                    if isinstance(expr, IdentifierNode):
+                        method_name = f"{expr.name}.{name_token.value}"
+                    elif hasattr(expr, 'name'):
+                        method_name = f"{expr.name}.{name_token.value}"
+                    else:
+                        method_name = f"{str(expr)}.{name_token.value}"
+                    expr = CallNode(method_name, args)
+                else:
+                    expr = CallNode(f"{expr.name}.{name_token.value}" if hasattr(expr, 'name') else f"{str(expr)}.{name_token.value}", [])
+            elif self.match(TokenType.LPAREN):
                 args = []
                 if not self.check(TokenType.RPAREN):
                     while True:
@@ -330,17 +366,21 @@ class Parser:
                             break
                 self.consume(TokenType.RPAREN, "Expected ')' after arguments")
                 if isinstance(expr, IdentifierNode):
-                    return CallNode(expr.name, args)
-                return CallNode(str(expr), args)
+                    expr = CallNode(expr.name, args)
+                else:
+                    expr = CallNode(str(expr), args)
             elif self.match(TokenType.LBRACKET):
                 index = self.expression()
                 self.consume(TokenType.RBRACKET, "Expected ']' after index")
-                return IndexNode(expr, index)
+                expr = IndexNode(expr, index)
             else:
                 break
         return expr
     
     def primary(self) -> ASTNode:
+        while self.match(TokenType.NEWLINE):
+            pass
+        
         token = self.peek()
         
         if self.match(TokenType.NUMBER):
@@ -366,9 +406,13 @@ class Parser:
         
         if self.match(TokenType.LBRACKET):
             elements = []
+            while self.match(TokenType.NEWLINE):
+                pass
             if not self.check(TokenType.RBRACKET):
                 while True:
                     elements.append(self.expression())
+                    while self.match(TokenType.NEWLINE):
+                        pass
                     if not self.match(TokenType.COMMA):
                         break
             self.consume(TokenType.RBRACKET, "Expected ']'")
@@ -376,16 +420,22 @@ class Parser:
         
         if self.match(TokenType.LBRACE):
             pairs = {}
+            while self.match(TokenType.NEWLINE):
+                pass
             if not self.check(TokenType.RBRACE):
                 while True:
                     key = self.expression()
                     self.consume(TokenType.COLON, "Expected ':'")
                     value = self.expression()
                     pairs[key] = value
+                    while self.match(TokenType.NEWLINE):
+                        pass
                     if not self.match(TokenType.COMMA):
                         break
             self.consume(TokenType.RBRACE, "Expected '}'")
             return DictNode(pairs)
+        
+        raise SyntaxError(f"Unexpected token: {token.type.name} at {token.line}:{token.column}")
         
         raise SyntaxError(f"Unexpected token: {token.type.name} at {token.line}:{token.column}")
     

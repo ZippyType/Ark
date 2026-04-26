@@ -2,7 +2,7 @@ x = 10
 
 try (
     result = x / 0
-) catch (e) (
-    print("Error caught:")
-    print(e)
+) catch (
+    print("Error caught")
+    print("Done")
 )

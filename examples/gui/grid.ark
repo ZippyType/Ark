@@ -1,0 +1,9 @@
+win = window("Grid Layout", 300, 200)
+
+label(win, "Name:").grid(row=0, column=0, padx=5, pady=5)
+entry(win).grid(row=0, column=1, padx=5, pady=5)
+
+label(win, "Email:").grid(row=1, column=0, padx=5, pady=5)
+entry(win).grid(row=1, column=1, padx=5, pady=5)
+
+win.mainloop()

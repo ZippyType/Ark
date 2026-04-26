@@ -1,0 +1,29 @@
+win = window("File Dialogs", 300, 250)
+
+fn open_file() (
+    path = ask_file("Select a file")
+    if (path != "") (
+        message("Selected: " + path, "File Selected")
+    )
+)
+
+fn save_file() (
+    path = ask_save("Save as")
+    if (path != "") (
+        message("Will save to: " + path, "Save")
+    )
+)
+
+fn choose_dir() (
+    folder = ask_dir("Choose folder")
+    if (folder != "") (
+        message("Folder: " + folder, "Folder")
+    )
+)
+
+label(win, "File Operations").pack(pady=10)
+button(win, "Open File", open_file).pack(pady=5)
+button(win, "Save File", save_file).pack(pady=5)
+button(win, "Choose Folder", choose_dir).pack(pady=5)
+
+win.mainloop()

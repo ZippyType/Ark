@@ -1,20 +1,16 @@
-import tkinter as tk
-
-win = tk.Tk()
-win.title("Button Example")
+win = window("Button Example", 300, 200)
 
 count = 0
 
-fn onclick() (
+fn on_click() (
     global count
     count = count + 1
-    label.config(text="Count: " + str(count))
+    lbl.config(text="Clicks: " + str(count))
 )
 
-label = tk.Label(win, text="Count: 0", font=("Arial", 20))
-label.pack(pady=10)
+lbl = label(win, "Clicks: 0", font=Font("Arial", 20))
+lbl.pack(pady=20)
 
-button = tk.Button(win, text="Click Me", command=onclick)
-button.pack()
+button(win, "Click Me", on_click).pack()
 
 win.mainloop()

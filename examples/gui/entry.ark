@@ -1,17 +1,14 @@
-import tkinter as tk
+win = window("Entry Example", 300, 200)
 
-win = tk.Tk()
-win.title("Entry Example")
+label(win, "Enter your name:").pack()
 
-tk.Label(win, text="Enter your name:").pack()
-
-entry = tk.Entry(win)
-entry.pack(pady=5)
+input_field = entry(win)
+input_field.pack(pady=5)
 
 fn show_text() (
-    print(entry.get())
+    message(input_field.get(), "Input")
 )
 
-tk.Button(win, text="Show Text", command=show_text).pack()
+button(win, "Show Text", show_text).pack()
 
 win.mainloop()

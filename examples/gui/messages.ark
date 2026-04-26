@@ -1,0 +1,25 @@
+win = window("Message Boxes", 300, 200)
+
+fn show_info() (
+    message("This is an info message!", "Information")
+)
+
+fn show_error() (
+    message("This is an error!", "Error", "error")
+)
+
+fn show_warning() (
+    message("Warning: Be careful!", "Warning", "warning")
+)
+
+fn ask_question() (
+    result = ask_yes_no("Do you like Ark?", "Question")
+    message("You answered: " + str(result), "Result")
+)
+
+button(win, "Show Info", show_info).pack(pady=5)
+button(win, "Show Error", show_error).pack(pady=5)
+button(win, "Show Warning", show_warning).pack(pady=5)
+button(win, "Ask Question", ask_question).pack(pady=5)
+
+win.mainloop()

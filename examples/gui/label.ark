@@ -1,15 +1,9 @@
-import tkinter as tk
+win = window("Label Styles", 400, 300)
 
-win = tk.Tk()
-win.title("Label Example")
+label(win, "Simple Label").pack()
 
-label1 = tk.Label(win, text="Simple Label")
-label1.pack()
-
-label2 = tk.Label(win, text="Colored Label", fg="red")
-label2.pack()
-
-label3 = tk.Label(win, text="Large Font", font=("Arial", 24))
-label3.pack()
+label(win, "Red Text").config(fg=Color.RED).pack()
+label(win, "Large Font", font=Font("Arial", 24)).pack()
+label(win, "Bold Text", font=Font("Arial", 16, "bold")).pack()
 
 win.mainloop()

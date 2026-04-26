@@ -1,0 +1,11 @@
+win = window("Canvas Drawing", 400, 400)
+
+cvs = canvas(win, width=380, height=350, bg=Color.WHITE)
+cvs.pack()
+
+cvs.create_rectangle(50, 50, 200, 150, fill=Color.RED)
+cvs.create_oval(220, 80, 350, 200, fill=Color.GREEN)
+cvs.create_line(50, 250, 350, 250, fill=Color.BLUE, width=3)
+cvs.create_text(200, 300, text="Hello from Ark!", fill=Color.PURPLE)
+
+win.mainloop()
