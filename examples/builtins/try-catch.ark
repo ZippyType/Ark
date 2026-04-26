@@ -1,6 +1,8 @@
+x = 10
+
 try (
-    x = 10 / 0
+    result = x / 0
 ) catch (e) (
-    print("Error caught: ")
+    print("Error caught:")
     print(e)
 )

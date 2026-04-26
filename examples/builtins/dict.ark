@@ -1,0 +1,4 @@
+x = dict({"name": "Alice", "age": 25})
+print(x)
+y = dict()
+print(y)

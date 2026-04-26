@@ -1,0 +1,5 @@
+write_file("test_output.txt", "Hello from Ark!")
+content = read_file("test_output.txt")
+print(content)
+delete_file("test_output.txt")
+print("Deleted!")

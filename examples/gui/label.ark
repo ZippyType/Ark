@@ -1,0 +1,15 @@
+import tkinter as tk
+
+win = tk.Tk()
+win.title("Label Example")
+
+label1 = tk.Label(win, text="Simple Label")
+label1.pack()
+
+label2 = tk.Label(win, text="Colored Label", fg="red")
+label2.pack()
+
+label3 = tk.Label(win, text="Large Font", font=("Arial", 24))
+label3.pack()
+
+win.mainloop()

@@ -1,0 +1,6 @@
+numbers = []
+append(numbers, 1)
+append(numbers, 2)
+append(numbers, 3)
+print(numbers)
+print(len(numbers))

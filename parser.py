@@ -1,8 +1,3 @@
-"""
-Ark Programming Language - Batch 3: Recursive Descent Parser
-Converting tokens into an executable AST.
-"""
-
 from typing import Any, Optional
 from lexer import Token, TokenType, tokenize
 from ast import (
@@ -54,7 +49,7 @@ class Parser:
     def consume(self, type: TokenType, message: str = None) -> Token:
         if self.check(type):
             return self.advance()
-        raise SyntaxError(f"{message or 'Expected'} at {self.peek().line}:{self.peek().column}")
+        raise SyntaxError(f"{message or 'Expected'} {type} at {self.peek().line}:{self.peek().column}")
     
     def synchronize(self):
         self.advance()
@@ -137,6 +132,8 @@ class Parser:
         condition = self.expression()
         self.consume(TokenType.RPAREN, "Expected ')' after condition")
         self.consume(TokenType.LPAREN, "Expected '(' for if body")
+        while self.match(TokenType.NEWLINE):
+            pass
         then_branch = self.block()
         self.consume(TokenType.RPAREN, "Expected ')' to close if body")
         
@@ -146,13 +143,17 @@ class Parser:
             elif_condition = self.expression()
             self.consume(TokenType.RPAREN, "Expected ')' after elif condition")
             self.consume(TokenType.LPAREN, "Expected '(' for elif body")
+            while self.match(TokenType.NEWLINE):
+                pass
             elif_body = self.block()
             self.consume(TokenType.RPAREN, "Expected ')' to close elif body")
             elif_branches.append((elif_condition, elif_body))
         
         else_branch = None
         if self.match(TokenType.ELSE):
-            self.consume(TokenType.LPAREN, "Expected '(' after else")
+            self.consume(TokenType.LPAREN, "Expected '(' for else body")
+            while self.match(TokenType.NEWLINE):
+                pass
             else_branch = self.block()
             self.consume(TokenType.RPAREN, "Expected ')' to close else body")
         
@@ -163,6 +164,8 @@ class Parser:
         condition = self.expression()
         self.consume(TokenType.RPAREN, "Expected ')' after condition")
         self.consume(TokenType.LPAREN, "Expected '(' for while body")
+        while self.match(TokenType.NEWLINE):
+            pass
         body = self.block()
         self.consume(TokenType.RPAREN, "Expected ')' to close while body")
         return WhileNode(condition, body)
@@ -183,14 +186,28 @@ class Parser:
     
     def try_statement(self) -> TryNode:
         self.consume(TokenType.LPAREN, "Expected '(' after try")
+        while self.match(TokenType.NEWLINE):
+            pass
         try_body = self.block()
         self.consume(TokenType.RPAREN, "Expected ')' to close try body")
-        self.match(TokenType.CATCH)
-        self.consume(TokenType.CATCH, "Expected 'catch'")
+        if not self.match(TokenType.CATCH):
+            raise SyntaxError(f"Expected 'catch' at {self.peek().line}:{self.peek().column}")
         variable = "error"
         if self.check(TokenType.IDENTIFIER):
             variable = self.advance().value
-        self.consume(TokenType.LPAREN, "Expected '(' after catch")
+        print(f"TRY: about to consume LPAREN, current is {self.peek().type.name} at {self.peek().line}:{self.peek().column}")
+        if not self.check(TokenType.LPAREN):
+            print(f"TRY: ERROR - not at LPAREN!")
+            # List next few tokens
+            for i in range(5):
+                idx = self.current + i
+                if idx < len(self.tokens):
+                    print(f"  tokens[{idx}] = {self.tokens[idx].type.name}")
+        else:
+            self.advance()
+            print(f"TRY: consumed LPAREN, now at {self.peek().type.name}")
+        while self.match(TokenType.NEWLINE):
+            pass
         catch_body = self.block()
         self.consume(TokenType.RPAREN, "Expected ')' to close catch body")
         return TryNode(try_body, catch_body, variable)

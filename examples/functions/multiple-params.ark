@@ -1,0 +1,6 @@
+fn greet(name, greeting) (
+    return greeting + ", " + name + "!"
+)
+
+print(greet("Alice", "Hello"))
+print(greet("Bob", "Hi"))

@@ -1,0 +1,9 @@
+numbers = [1, 2, 3, 4, 5]
+squares = []
+
+for n in numbers (
+    squared = n * n
+    append(squares, squared)
+)
+
+print(squares)

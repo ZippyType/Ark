@@ -1,0 +1,8 @@
+fn process(numbers) (
+    total = sum(numbers)
+    avg = total / len(numbers)
+    return avg
+)
+
+nums = [10, 20, 30, 40, 50]
+print(process(nums))

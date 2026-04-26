@@ -1,0 +1,2 @@
+import("examples/data-structures/dicts.ark")
+print(person["name"])

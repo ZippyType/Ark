@@ -1,0 +1,3 @@
+import("examples/math-utils.ark")
+result = add(10, 5)
+print(result)

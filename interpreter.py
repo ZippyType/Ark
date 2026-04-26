@@ -1,7 +1,4 @@
-"""
-Ark Programming Language - Batch 5: Memory & Variables
-Scoped variable storage: global vs. local scope.
-"""
+
 
 from typing import Any, Callable, Optional
 from pathlib import Path
@@ -108,6 +105,16 @@ class Interpreter:
         self.global_scope.define("button", self._native_button)
         self.global_scope.define("label", self._native_label)
         self.global_scope.define("entry", self._native_entry)
+        self.global_scope.define("pack", self._native_pack)
+        self.global_scope.define("grid", self._native_grid)
+        self.global_scope.define("config", self._native_config)
+        self.global_scope.define("mainloop", self._native_mainloop)
+        self.global_scope.define("bind", self._native_bind)
+        self.global_scope.define("get", self._native_get)
+        self.global_scope.define("http_get", self._native_http_get)
+        self.global_scope.define("http_post", self._native_http_post)
+        self.global_scope.define("html", self._native_html)
+        self.global_scope.define("webview", self._native_webview)
         self.global_scope.define("range", self._native_range)
         self.global_scope.define("abs", self._native_abs)
         self.global_scope.define("min", self._native_min)
@@ -184,9 +191,80 @@ class Interpreter:
         return input(str(prompt))
     
     def _native_run(self, command: str) -> str:
+        print(f"Ark: run command? \"{command}\"")
+        print("Warning: Command might be malicious. Continue? (y/n) > ", end="")
+        confirm = input()
+        if confirm.lower() != "y":
+            return "Command cancelled"
+        
         import subprocess
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         return result.stdout or result.stderr
+    
+    def _native_window(self, title: str = "Ark Window", width: int = 400, height: int = 300):
+        import tkinter as tk
+        win = tk.Tk()
+        win.title(title)
+        win.geometry(f"{width}x{height}")
+        return win
+    
+    def _native_button(self, parent, text: str, command: callable):
+        import tkinter as tk
+        btn = tk.Button(parent, text=text, command=command)
+        return btn
+    
+    def _native_label(self, parent, text: str):
+        import tkinter as tk
+        lbl = tk.Label(parent, text=text)
+        return lbl
+    
+    def _native_entry(self, parent):
+        import tkinter as tk
+        ent = tk.Entry(parent)
+        return ent
+    
+    def _native_pack(self, widget, **kwargs):
+        widget.pack(**kwargs)
+        return None
+    
+    def _native_grid(self, widget, **kwargs):
+        widget.grid(**kwargs)
+        return None
+    
+    def _native_config(self, widget, **kwargs):
+        widget.config(**kwargs)
+        return None
+    
+    def _native_mainloop(self, window):
+        window.mainloop()
+    
+    def _native_bind(self, widget, event: str, callback: callable):
+        widget.bind(event, lambda e: callback())
+        return None
+    
+    def _native_get(self, widget):
+        return widget.get()
+    
+    def _native_http_get(self, url: str) -> str:
+        import urllib.request
+        return urllib.request.urlopen(url).read().decode()
+    
+    def _native_http_post(self, url: str, data: str) -> str:
+        import urllib.request
+        req = urllib.request.Request(url, data=data.encode(), method='POST')
+        return urllib.request.urlopen(req).read().decode()
+    
+    def _native_html(self, html_content: str):
+        import tkinter as tk
+        from tkinter import webview
+        # Simple text display for HTML
+        import urllib.parse
+        return urllib.parse.quote(html_content)
+    
+    def _native_webview(self, url: str = ""):
+        # Placeholder - actual webview needs system webview library
+        print("Web view not available in basic mode")
+        return None
     
     def _native_read_file(self, filepath: str) -> str:
         path = Path(filepath)
@@ -237,9 +315,13 @@ class Interpreter:
         return list(zip(*iterables))
     
     def _native_map(self, func: Callable, iterable: Any):
+        if isinstance(func, Function):
+            return [func(self, item) for item in iterable]
         return list(map(func, iterable))
     
     def _native_filter(self, func: Callable, iterable: Any):
+        if isinstance(func, Function):
+            return [item for item in iterable if self._is_truthy(func(self, item))]
         return list(filter(func, iterable))
     
     def interpret(self, program: ProgramNode) -> Any:

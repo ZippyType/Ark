@@ -6,3 +6,5 @@ try (
     print("Error caught:")
     print(e)
 )
+
+print("Program continues...")

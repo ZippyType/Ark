@@ -1,0 +1,6 @@
+x = list(1, 2, 3)
+print(x)
+y = list("abc")
+print(y)
+z = list()
+print(z)

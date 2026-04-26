@@ -1,0 +1,6 @@
+print(type(42))
+print(type(3.14))
+print(type("hello"))
+print(type(true))
+print(type([1, 2, 3]))
+print(type({"a": 1}))

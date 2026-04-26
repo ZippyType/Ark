@@ -1,7 +1,4 @@
-"""
-Ark Programming Language - Batch 1: Advanced Lexer
-Tokenizing (), strings, numbers, and reserved keywords.
-"""
+
 
 from enum import Enum, auto
 

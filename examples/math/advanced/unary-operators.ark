@@ -1,0 +1,10 @@
+x = 5
+
+x = -x
+print(x)
+
+result = not true
+print(result)
+
+result = not false
+print(result)

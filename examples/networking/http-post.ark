@@ -1,0 +1,4 @@
+print("Posting data to httpbin.org...")
+data = "name=Ark&version=1.0"
+result = http_post("https://httpbin.org/post", data)
+print(result)

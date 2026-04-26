@@ -1,0 +1,10 @@
+fn apply(func, value) (
+    return func(value)
+)
+
+fn double(x) (
+    return x * 2
+)
+
+result = apply(double, 5)
+print(result)

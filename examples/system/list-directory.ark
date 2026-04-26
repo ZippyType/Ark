@@ -1,0 +1,2 @@
+result = run("ls -la")
+print(result)

@@ -1,0 +1,6 @@
+nums = [1, 2, 3, 4, 5]
+fn double(x) (
+    return x * 2
+)
+doubled = map(double, nums)
+print(doubled)

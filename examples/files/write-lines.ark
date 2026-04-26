@@ -1,0 +1,15 @@
+lines = []
+
+append(lines, "Line 1")
+append(lines, "Line 2")
+append(lines, "Line 3")
+
+content = ""
+i = 0
+while (i < len(lines)) (
+    content = content + lines[i] + "\n"
+    i = i + 1
+)
+
+write_file("multiline.txt", content)
+print(read_file("multiline.txt"))
