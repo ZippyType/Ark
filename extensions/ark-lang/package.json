@@ -1,0 +1,30 @@
+{
+  "name": "ark-lang",
+  "displayName": "Ark Programming Language",
+  "description": "Syntax highlighting for the Ark programming language",
+  "version": "0.1.0",
+  "publisher": "arklang",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "ark",
+        "aliases": ["Ark", "ark"],
+        "extensions": [".ark"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ark",
+        "scopeName": "source.ark",
+        "path": "./syntaxes/ark.tmLanguage.json"
+      }
+    ]
+  }
+}

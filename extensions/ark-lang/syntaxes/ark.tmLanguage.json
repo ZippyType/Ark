@@ -1,0 +1,97 @@
+{
+  "information_for_contributors": [
+    "This file has been auto-generated to provide syntax highlighting for the Ark language."
+  ],
+  "version": "0.1.0",
+  "name": "Ark",
+  "scopeName": "source.ark",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "begin": "#",
+          "end": "$"
+        },
+        {
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.ark",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.escape.ark",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.ark",
+          "match": "\\b(fn|if|else|elif|while|for|in|return|try|catch|import|from|break|continue|pass)\\b"
+        },
+        {
+          "name": "keyword.other.ark",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "support.function.ark",
+          "match": "\\b(print|type|len|str|int|float|bool|list|dict|input|range|abs|min|max|sum|sorted)\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "entity.name.function.ark",
+          "match": "(?<=fn\\s)\\w+"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.ark",
+          "match": "\\b\\d+(\\.\\d+)?\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.ark",
+          "match": "[+\\-*/%=!<>]+"
+        }
+      ]
+    }
+  }
+}

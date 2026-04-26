@@ -1,0 +1,25 @@
+fn factorial(n) (
+    if (n <= 1) (
+        1
+    ) else (
+        n * factorial(n - 1)
+    )
+)
+
+result = factorial(5)
+print("Factorial of 5: ")
+print(result)
+
+fn fibonacci(n) (
+    if (n <= 1) (
+        n
+    ) else (
+        fibonacci(n - 1) + fibonacci(n - 2)
+    )
+)
+
+i = 0
+while (i < 10) (
+    print(fibonacci(i))
+    i = i + 1
+)

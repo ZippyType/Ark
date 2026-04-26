@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Ark Programming Language - Main Launcher"""
+
+import sys
+import traceback
+from pathlib import Path
+
+ARK_DIR = Path(__file__).parent.parent
+sys.path.insert(0, str(ARK_DIR))
+
+from parser import parse
+from interpreter import Interpreter, ArkRuntimeError
+
+
+def run_file(filepath):
+    path = Path(filepath)
+    if not path.exists():
+        print(f"ark: file not found: {filepath}", file=sys.stderr)
+        sys.exit(1)
+    
+    source = path.read_text()
+    
+    try:
+        program = parse(source)
+        interpreter = Interpreter()
+        interpreter.interpret(program)
+    except Exception as e:
+        print(f"ark: error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def run_shell():
+    import readline
+    interpreter = Interpreter()
+    print("Ark Programming Language")
+    print("Type 'exit()' to quit")
+    print()
+    
+    while True:
+        try:
+            line = input("ark> ")
+            if not line.strip():
+                continue
+            
+            if line.strip() == "exit()":
+                break
+            
+            try:
+                program = parse(line)
+                interpreter.interpret(program)
+            except Exception as e:
+                print(f"error: {e}", file=sys.stderr)
+        except (KeyboardInterrupt, EOFError):
+            print()
+            break
+
+
+def main():
+    if len(sys.argv) == 1:
+        run_shell()
+    elif len(sys.argv) == 2:
+        if sys.argv[1] == "--version" or sys.argv[1] == "-v":
+            print("Ark 0.1.0")
+        elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
+            print("Usage: ark [file.ark]")
+            print("       ark -c 'code'")
+        else:
+            run_file(sys.argv[1])
+    elif len(sys.argv) == 3 and sys.argv[1] == "-c":
+        source = sys.argv[2]
+        try:
+            program = parse(source)
+            interpreter = Interpreter()
+            interpreter.interpret(program)
+        except Exception as e:
+            print(f"ark: error: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print("Usage: ark [file.ark]", file=sys.stderr)
+        print("       ark -c 'code'", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

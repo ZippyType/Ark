@@ -1,75 +1,96 @@
 #!/bin/bash
 
-# Ark Programming Language - Installation Script for Ubuntu/Linux
-# This script sets up the Ark executable in your system PATH
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+BIN_DIR="$SCRIPT_DIR/bin"
+ARK_BIN="$BIN_DIR/ark"
+EXT_DIR="$SCRIPT_DIR/extensions/ark-lang"
 
-set -e
+if [ ! -f "$ARK_BIN" ]; then
+    echo "Error: ark binary not found at $ARK_BIN"
+    exit 1
+fi
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+if [ ! -d "$EXT_DIR" ]; then
+    echo "Error: ark-lang extension not found at $EXT_DIR"
+    exit 1
+fi
 
-echo -e "${BLUE}=== Ark Language Installation ===${NC}"
+chmod +x "$ARK_BIN"
 
-# Detect the repository root
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ARK_ROOT="$SCRIPT_DIR"
+# Setup PATH in shell config files
+PROFILE_FILE="$HOME/.profile"
+BASHRC_FILE="$HOME/.bashrc"
+ZSHRC_FILE="$HOME/.zshrc"
+FISH_CONFIG="$HOME/.config/fish/config.fish"
 
-echo "Ark directory: $ARK_ROOT"
-
-# Make the ark executable
-chmod +x "$ARK_ROOT/ark"
-echo -e "${GREEN}✓ Made ark executable${NC}"
-
-# Option 1: Create symlink in /usr/local/bin (requires sudo)
-if [ -w /usr/local/bin ]; then
-    sudo ln -sf "$ARK_ROOT/ark" /usr/local/bin/ark
-    echo -e "${GREEN}✓ Installed to /usr/local/bin/ark (system-wide)${NC}"
-else
-    # Option 2: Add to user's local bin
-    mkdir -p "$HOME/.local/bin"
-    ln -sf "$ARK_ROOT/ark" "$HOME/.local/bin/ark"
-    
-    # Check if ~/.local/bin is in PATH
-    if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
-        echo -e "${GREEN}✓ Installed to ~/.local/bin/ark${NC}"
+add_path_to_file() {
+    local file="$1"
+    local path_line='export PATH="'"$BIN_DIR"':$PATH"'
+    if [ -f "$file" ]; then
+        if ! grep -q "ark-lang" "$file" 2>/dev/null; then
+            echo "$path_line" >> "$file"
+        fi
     else
-        echo -e "${BLUE}Adding ~/.local/bin to PATH...${NC}"
-        
-        # Add to bashrc
-        if ! grep -q '~/.local/bin' ~/.bashrc; then
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-        fi
-        
-        # Add to zshrc if it exists
-        if [ -f ~/.zshrc ]; then
-            if ! grep -q '~/.local/bin' ~/.zshrc; then
-                echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
-            fi
-        fi
-        
-        echo -e "${GREEN}✓ Installed to ~/.local/bin/ark${NC}"
-        echo -e "${BLUE}⚠ Run: source ~/.bashrc (or source ~/.zshrc)${NC}"
+        echo "$path_line" >> "$file"
+    fi
+}
+
+add_path_to_file "$PROFILE_FILE"
+add_path_to_file "$BASHRC_FILE"
+add_path_to_file "$ZSHRC_FILE"
+
+# Try to add to fish config
+if [ -d "$HOME/.config/fish" ]; then
+    if [ ! -f "$FISH_CONFIG" ]; then
+        mkdir -p "$HOME/.config/fish"
+        touch "$FISH_CONFIG"
+    fi
+    if ! grep -q "ark-lang" "$FISH_CONFIG" 2>/dev/null; then
+        echo 'set -gx PATH $PATH '"$BIN_DIR" >> "$FISH_CONFIG"
     fi
 fi
 
-# Verify installation
-echo ""
-echo -e "${BLUE}Verifying installation...${NC}"
-if command -v ark &> /dev/null; then
-    echo -e "${GREEN}✓ ark is available in PATH${NC}"
-    ark --version 2>/dev/null || echo "  (Ready to use)"
+# Try to link to /usr/local/bin (requires root)
+if [ -L "/usr/local/bin/ark" ] 2>/dev/null || [ -f "/usr/local/bin/ark" ] 2>/dev/null; then
+    echo "Warning: /usr/local/bin/ark already exists"
 else
-    echo -e "${BLUE}⚠ ark not yet in PATH. Reload your shell:${NC}"
-    echo "    source ~/.bashrc"
+    if ln -sf "$ARK_BIN" "/usr/local/bin/ark" 2>/dev/null; then
+        echo "Installed ark to /usr/local/bin/ark"
+    else
+        echo "Added $BIN_DIR to PATH in shell config files"
+    fi
 fi
 
+# Install VS Code extension
+VSCODE_EXT_DIR="$HOME/.vscode/extensions"
+mkdir -p "$VSCODE_EXT_DIR"
+EXT_TARGET="$VSCODE_EXT_DIR/ark-lang"
+
+if [ -d "$EXT_TARGET" ]; then
+    echo "VS Code extension already installed at $EXT_TARGET"
+else
+    cp -r "$EXT_DIR" "$VSCODE_EXT_DIR"
+    echo "VS Code extension installed to $EXT_TARGET"
+fi
+
+# Refresh bashrc
+source ~/.bashrc
+
 echo ""
-echo -e "${GREEN}=== Installation Complete ===${NC}"
+echo "============================================"
+echo "     === Installation Complete ==="
+echo "============================================"
 echo ""
-echo -e "Usage:"
-echo -e "  ${GREEN}ark${NC}                    # Start interactive shell"
-echo -e "  ${GREEN}ark script.ark${NC}         # Run a script"
-echo -e ""
-echo -e "Try: ${GREEN}ark examples/hello.ark${NC}"
+echo "Installed:"
+echo "  ✓ ark command"
+echo "  ✓ VS Code extension (ark-lang)"
+echo ""
+echo "Use:"
+echo "  ark file.ark          - Run an Ark file"
+echo "  ark -c 'code'     - Run code from command line"
+echo "  ark               - Interactive shell"
+echo ""
+echo "Restart VS Code or run 'Extensions: Reload Window'"
+echo "to activate the Ark language extension."
+echo ""
+echo "Enjoy Ark! 🦕"

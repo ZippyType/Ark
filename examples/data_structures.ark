@@ -1,0 +1,26 @@
+numbers = [1, 2, 3, 4, 5]
+print(numbers)
+
+print(numbers[0])
+
+numbers[0] = 10
+print(numbers)
+
+fn sum(list) (
+    total = 0
+    i = 0
+    while (i < len(list)) (
+        total = total + list[i]
+        i = i + 1
+    )
+    total
+)
+
+print("Sum: ")
+print(sum(numbers))
+
+person = {"name": "Alice", "age": 25}
+print(person)
+print(person["name"])
+person["age"] = 26
+print(person)

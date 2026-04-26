@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d9ff"/>
+      <stop offset="100%" style="stop-color:#00ff88"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#00d9ff" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="url(#bg)"/>
+  
+  <!-- Main A shape -->
+  <g filter="url(#shadow)">
+    <path d="M256 60 L420 420 L360 420 L330 340 L182 340 L152 420 L92 420 L256 60Z" 
+          fill="url(#accent)" opacity="0.9"/>
+  </g>
+  
+  <!-- Inner A Cutout -->
+  <path d="M256 130 L195 290 L317 290 Z" fill="url(#bg)"/>
+  
+  <!-- Parentheses () around the A -->
+  <g stroke="url(#accent)" stroke-width="28" fill="none" stroke-linecap="round" filter="url(#glow)">
+    <!-- Left parenthesis ( -->
+    <path d="M100 150 Q60 256 100 362"/>
+    <!-- Right parenthesis ) -->
+    <path d="M412 150 Q452 256 412 362"/>
+  </g>
+  
+  <!-- Code brackets [] accent -->
+  <g stroke="#00ff88" stroke-width="16" fill="none" stroke-linecap="round" opacity="0.6">
+    <path d="M60 420 L60 380 L80 380"/>
+    <path d="M452 420 L452 380 L432 380"/>
+  </g>
+  
+  <!-- Dot highlights -->
+  <circle cx="256" cy="430" r="12" fill="#00d9ff" filter="url(#glow)"/>
+  <circle cx="256" cy="390" r="8" fill="#00ff88" opacity="0.7"/>
+</svg>
