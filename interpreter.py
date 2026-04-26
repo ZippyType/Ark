@@ -451,12 +451,14 @@ class Interpreter:
     
     def _visit_while(self, node):
         while self._is_truthy(self.execute(node.condition)):
-            try:
-                self._visit_block(node.body)
-            except BreakLoop:
-                break
-            except ContinueLoop:
-                continue
+            old_scope_idx = self.current_scope_idx
+            old_scope = self.scopes[old_scope_idx]
+            
+            for stmt in node.body.statements:
+                self.execute(stmt)
+            
+            if old_scope_idx != self.current_scope_idx:
+                self.current_scope_idx = old_scope_idx
         return None
     
     def _visit_for(self, node):

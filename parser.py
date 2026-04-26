@@ -173,10 +173,9 @@ class Parser:
         variable = self.consume(TokenType.IDENTIFIER, "Expected loop variable").value
         self.consume(TokenType.IN, "Expected 'in'")
         iterable = self.expression()
-        self.consume(TokenType.LPAREN, "Expected '(' for for body")
-        body = self.block()
-        self.consume(TokenType.RPAREN, "Expected ')' to close for body")
-        return ForNode(variable, iterable, body)
+        # For loop uses single statement, not block
+        stmt = self.statement()
+        return ForNode(variable, iterable, BlockNode([stmt]))
     
     def return_statement(self) -> ReturnNode:
         value = None
@@ -339,6 +338,47 @@ class Parser:
             expr = self.expression()
             self.consume(TokenType.RPAREN, "Expected ')'")
             return GroupingNode(expr)
+        
+        if self.match(TokenType.LBRACKET):
+            elements = []
+            if not self.check(TokenType.RBRACKET):
+                while True:
+                    elements.append(self.expression())
+                    if not self.match(TokenType.COMMA):
+                        break
+            self.consume(TokenType.RBRACKET, "Expected ']'")
+            return ListNode(elements)
+        
+        if self.match(TokenType.LBRACE):
+            pairs = {}
+            if not self.check(TokenType.RBRACE):
+                while True:
+                    key = self.expression()
+                    self.consume(TokenType.COLON, "Expected ':'")
+                    value = self.expression()
+                    pairs[key] = value
+                    if not self.match(TokenType.COMMA):
+                        break
+            self.consume(TokenType.RBRACE, "Expected '}'")
+            return DictNode(pairs)
+        
+        raise SyntaxError(f"Unexpected token: {token.type.name} at {token.line}:{token.column}")
+    
+    def _parse_builtin_call(self, token: Token) -> ASTNode:
+        self.consume(TokenType.LPAREN, "Expected '('")
+        args = []
+        if not self.check(TokenType.RPAREN):
+            while True:
+                args.append(self.expression())
+                if not self.match(TokenType.COMMA):
+                    break
+        self.consume(TokenType.RPAREN, "Expected ')'")
+        
+        if token.type == TokenType.PRINT:
+            return PrintNode(args)
+        elif token.type == TokenType.TYPE:
+            return TypeNode(args[0] if args else None)
+        return CallNode(token.value, args)
         
         if self.match(TokenType.LBRACKET):
             elements = []

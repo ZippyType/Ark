@@ -88,4 +88,4 @@ Use `.ark` for Ark source files.
 
 ## License
 
-MIT
+GPL 3.0
